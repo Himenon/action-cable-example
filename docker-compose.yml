@@ -1,0 +1,41 @@
+version: '2.1'
+
+services:
+  server:
+    build:
+      context: .
+    volumes:
+      - ./:/app
+    links:
+      - redis
+      - db
+    ports:
+      - 3000:3000
+    command: ["rails", "s", "-b", "0.0.0.0"]
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: rails
+      DATABASE_PASSWORD: rails
+    depends_on:
+      - redis
+      - db
+  redis:
+    image: redis:4.0
+    expose:
+      - 6379
+  db:
+    image: postgres:9.3-alpine
+    expose:
+      - 5432
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: rails
+      POSTGRES_PASSWORD: rails
+    volumes:
+      - db-action-cable:/var/lib/postgresql/data
+
+volumes:
+  db-action-cable:
+
